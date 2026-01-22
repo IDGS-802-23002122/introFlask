@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <form action="/resultado" method="post">
+        <div class="mb-3">
+            <label for="n1" class="form-label">Número 1:</label>
+            <input type="number" step="any" class="form-control" id="n1" name="n1" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="n2" class="form-label">Número 2:</label>
+            <input type="number" step="any" class="form-control" id="n2" name="n2" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Operación:</label>
+            <select class="form-select" name="operacion">
+                <option value="sumar">Sumar</option>
+                <option value="restar">Restar</option>
+                <option value="multiplicar">Multiplicar</option>
+                <option value="dividir">Dividir</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Calcular</button>
+    </form>
+</div>
+{% endblock %}

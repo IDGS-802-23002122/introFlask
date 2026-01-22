@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app=Flask(__name__)
 
@@ -55,6 +55,48 @@ def operas():    #las tres comillas sirven para que lo que yo escriba sea multil
     </form>
                 
           '''
+
+@app.route("/operasBas")
+def operas1():
+    return render_template("operasBas.html")
+
+from flask import Flask, request
+
+@app.route("/resultado", methods=["GET", "POST"])
+def resultado():
+    # 1. Obtenemos los datos del formulario
+    n1 = request.form.get("n1")
+    n2 = request.form.get("n2")
+    operacion = request.form.get("operacion")
+
+    # Validación básica por si llegan vacíos
+    if not n1 or not n2:
+        return "Por favor, ingresa ambos números."
+
+    # Los datos se convierten a float para realizar cálculos
+    n1 = float(n1)
+    n2 = float(n2)
+
+    # 2. Lógica para decidir qué operación realizar
+    if operacion == "sumar":
+        resultado_final = n1 + n2
+        accion = "suma"
+    elif operacion == "restar":
+        resultado_final = n1 - n2
+        accion = "resta"
+    elif operacion == "multiplicar":
+        resultado_final = n1 * n2
+        accion = "multiplicación"
+    elif operacion == "dividir":
+        if n2 == 0:
+            return "Error: No se puede dividir entre cero."
+        resultado_final = n1 / n2
+        accion = "división"
+    else:
+        return "Operación no válida."
+
+    # 3. Retorna el resultado
+    return f"La {accion} de {n1} y {n2} es: {resultado_final}"
 
 
 
