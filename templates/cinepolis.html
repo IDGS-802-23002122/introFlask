@@ -1,0 +1,74 @@
+# nombre cliente
+# cantidad compradores (maximo 7 boletos)
+# un check con 2 opciones. Tarjeta de credito [o]si [o]no
+# Cantidad de boletos
+
+# Sin mensajes flash
+# Valor a pagar
+
+# cada boleto vale $12.000
+# descuentos en la compra 
+# +5 boletos=15% valor a pagar
+# 3,4 o 5 = 10%
+# 2 = 0
+
+# Si usan la tarjeta cineco (tarjeta) = 10% descuento
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4 p-4" style="background-color: #003399; color: white; border-radius: 10px;">
+    <h2 class="text-center mb-4">Cinépolis</h2>
+    
+    <form action="/calculoBoletos" method="post">
+        <div class="row">
+            <div class="col-md-6 border p-3">
+                <h4>Entradas</h4>
+                
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre cliente:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nComprador" class="form-label">Cantidad compradores:</label>
+                    <input type="number" class="form-control" id="nComprador" name="comprador" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-block">Tarjeta Cineco:</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="tarjeta" id="si" value="si" checked>
+                        <label class="form-check-label" for="si">Si</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="tarjeta" id="no" value="no">
+                        <label class="form-check-label" for="no">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nBoletos" class="form-label">Cantidad de BoletOs:</label>
+                    <input type="number" class="form-control" id="nBoletos" name="boletos" required>
+                </div>
+            </div>
+
+            <div class="col-md-6 border p-3">
+                <h4>Salidas</h4>
+                <div class="mb-3">
+                    <label for="resultado" class="form-label">Valor a Pagar:</label>
+                    <input type="text" class="form-control" id="resultado" value="{{ total }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 text-center border p-3">
+                <h4>Acciones</h4>
+                <button type="submit" class="btn btn-light mx-2">Procesar</button>
+                <a href="/" class="btn btn-light mx-2">Salir</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

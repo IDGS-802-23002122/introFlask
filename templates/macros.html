@@ -1,0 +1,9 @@
+// Reutilizar elementos html
+{% macro datos(name,placeholder,type="text") %}
+
+<div class="mb-3">
+    <label for="{{name}}" class="form-label">{{ name }}:</label>
+    <input type="{{type}}" name="{{name}}" id="{{name}}" placeholder="{{placeholder}}">
+</div>
+
+{% endmacro %}

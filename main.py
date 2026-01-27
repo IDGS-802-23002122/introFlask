@@ -1,3 +1,4 @@
+import math
 from flask import Flask, render_template, request
 
 app=Flask(__name__)
@@ -60,7 +61,6 @@ def operas():    #las tres comillas sirven para que lo que yo escriba sea multil
 def operas1():
     return render_template("operasBas.html")
 
-from flask import Flask, request
 
 @app.route("/resultado", methods=["GET", "POST"])
 def resultado():
@@ -98,7 +98,70 @@ def resultado():
     # 3. Retorna el resultado
     return f"La {accion} de {n1} y {n2} es: {resultado_final}"
 
+@app.route("/alumnos")
+def alumnos():
+    return render_template("alumnos.html")
 
+@app.route("/distancia")
+def distancia():
+    return render_template("distancia.html")
+
+@app.route("/calculoDistancia", methods=["GET", "POST"])
+def calculo():
+    distancia = None # Esto sirve para almacenar el resultado
+    
+    if request.method == "POST":
+        # 1. Convertir a float para poder operar
+        x1 = float(request.form.get("x1"))
+        y1 = float(request.form.get("y1"))
+        x2 = float(request.form.get("x2"))
+        y2 = float(request.form.get("y2"))
+
+        distancia = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
+
+    return render_template("distancia.html", resultado=distancia)
+
+@app.route("/cinepolis")
+def cinepolis():
+    return render_template("cinepolis.html")
+
+@app.route('/calculoBoletos', methods=['POST'])
+def calculo_boletos():
+    # Recibimos los datos del formulario
+    nombre = request.form.get('nombre')
+    compradores = int(request.form.get('comprador'))
+    boletos = int(request.form.get('boletos'))
+    usa_tarjeta = request.form.get('tarjeta') # 'si' o 'no'
+
+    # REGLA: Máximo 7 boletos por persona
+    limite_boletos = compradores * 7
+    
+    if boletos > limite_boletos:
+        # Si excede el límite, podemos retornar un mensaje o limpiar el campo
+        mensaje_error = f"Error: {compradores} personas solo pueden comprar máximo {limite_boletos} boletos."
+        return render_template('cinepolis.html', total=mensaje_error)
+
+    # Cálculo base
+    precio_boleto = 12000
+    subtotal = boletos * precio_boleto
+
+    # DESCUENTO POR CANTIDAD DE BOLETOS
+    descuento_cantidad = 0
+    if boletos > 5:
+        descuento_cantidad = 0.15 # 15%
+    elif boletos >= 3: 
+        descuento_cantidad = 0.10 # 10%
+    
+    # Aplicamos el primer descuento
+    subtotal = subtotal - (subtotal * descuento_cantidad)
+
+    # DESCUENTO POR TARJETA CINECO (10% adicional)
+    if usa_tarjeta == "si":
+        subtotal = subtotal - (subtotal * 0.10)
+
+    # Resultado al formulario
+    return render_template('cinepolis.html', total=f"${subtotal:,.0f}")
+  
 
 if __name__ == '__main__':
     app.run(debug=True) #debug para modo programador, se actualiza cualquier dato sin necesidad de apagar y prender entorno
