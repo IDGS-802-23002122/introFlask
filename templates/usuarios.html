@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{# Importamos las macros desde el archivo externo #}
+{% import "_macros.html" as macros %}
+
+{# Corregido: 'forma' por 'form' y falta cerrar el '>' #}
+<form action="/usuarios" method="post">
+
+    {{ form.csrf_token }}
+    {# No necesitas la línea de abajo si ya pusiste {{form.csrf_token}} #}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="mb-3">
+        {{ macros.campoNuevo(form.matricula, class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ macros.campoNuevo(form.nombre, class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ macros.campoNuevo(form.apaterno, class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ macros.campoNuevo(form.amaterno, class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ macros.campoNuevo(form.email, class="form-control") }}
+    </div>
+  
+    <button type="submit" class="btn btn-primary w-100">Guardar</button>
+</form>
+
+<hr>
+
+<h1>Matricula: {{ mat }}</h1>
+<h1>Nombre: {{ nom }}</h1>
+<h1>Apaterno: {{ apa }}</h1>
+<h1>Amaterno: {{ ama }}</h1>
+<h1>Correo: {{ email }}</h1>
+
+{% endblock %} 

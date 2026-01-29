@@ -1,7 +1,14 @@
-import math
+from math import *
 from flask import Flask, render_template, request
+from flask import flash
+from flask_wtf.csrf import CSRFProtect 
+import forms
+
 
 app=Flask(__name__)
+app.secret_key='Clave secreta'
+csrf=CSRFProtect()
+
 
 @app.route('/')
 def index():
@@ -121,6 +128,29 @@ def calculo():
 
     return render_template("distancia.html", resultado=distancia)
 
+@app.route("/usuarios", methods=["GET", "POST"])
+def usuarios():
+        mat=0
+        nom=''
+        apa=''
+        ama=''
+        email=''
+        usuarios_class=forms.UserForm(request.form)
+        if request.method=='POST' and usuarios_class.validate():
+            mat=usuarios_class.matricula.data
+            nom=usuarios_class.matricula.data
+            apaterno=usuarios_class.apaterno.data
+            amaterno=usuarios_class.amaterno.data
+            email=usuarios_class.email.data
+
+            mensaje='Bienvenido {}'.format(nom)
+            flash(mensaje)
+
+        return render_template('usuarios.html',form=usuarios_class,
+                               mat=mat,nom=nom,apa=apa,ama=ama,email=email
+                               )
+
+
 @app.route("/cinepolis")
 def cinepolis():
     return render_template("cinepolis.html")
@@ -161,8 +191,8 @@ def calculo_boletos():
 
     # Resultado al formulario
     return render_template('cinepolis.html', total=f"${subtotal:,.0f}")
-  
 
 if __name__ == '__main__':
+    csrf.init_app(app)
     app.run(debug=True) #debug para modo programador, se actualiza cualquier dato sin necesidad de apagar y prender entorno
 
