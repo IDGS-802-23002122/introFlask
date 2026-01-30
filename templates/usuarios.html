@@ -9,7 +9,6 @@
 <form action="/usuarios" method="post">
 
     {{ form.csrf_token }}
-    {# No necesitas la línea de abajo si ya pusiste {{form.csrf_token}} #}
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <div class="mb-3">

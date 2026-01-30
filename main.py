@@ -3,11 +3,12 @@ from flask import Flask, render_template, request
 from flask import flash
 from flask_wtf.csrf import CSRFProtect 
 import forms
+from forms import CinepolisForm
 
 
 app=Flask(__name__)
 app.secret_key='Clave secreta'
-csrf=CSRFProtect()
+csrf=CSRFProtect(app)
 
 
 @app.route('/')
@@ -109,24 +110,23 @@ def resultado():
 def alumnos():
     return render_template("alumnos.html")
 
-@app.route("/distancia")
+@app.route("/distancia", methods=["GET", "POST"])
 def distancia():
-    return render_template("distancia.html")
-
-@app.route("/calculoDistancia", methods=["GET", "POST"])
-def calculo():
-    distancia = None # Esto sirve para almacenar el resultado
-    
+    distancia_resultado = None
     if request.method == "POST":
-        # 1. Convertir a float para poder operar
-        x1 = float(request.form.get("x1"))
-        y1 = float(request.form.get("y1"))
-        x2 = float(request.form.get("x2"))
-        y2 = float(request.form.get("y2"))
+        try:
+            x1 = float(request.form.get("x1", 0))
+            y1 = float(request.form.get("y1", 0))
+            x2 = float(request.form.get("x2", 0))
+            y2 = float(request.form.get("y2", 0))
 
-        distancia = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
-
-    return render_template("distancia.html", resultado=distancia)
+            distancia_resultado = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
+        except (ValueError, TypeError):
+            distancia_resultado = 0
+            flash("¡Cálculo de distancia realizado!", "success") 
+        except:
+            flash("Error en los datos ingresados", "danger")
+    return render_template("distancia.html", resultado=distancia_resultado)
 
 @app.route("/usuarios", methods=["GET", "POST"])
 def usuarios():
@@ -138,7 +138,7 @@ def usuarios():
         usuarios_class=forms.UserForm(request.form)
         if request.method=='POST' and usuarios_class.validate():
             mat=usuarios_class.matricula.data
-            nom=usuarios_class.matricula.data
+            nom=usuarios_class.nombre.data
             apaterno=usuarios_class.apaterno.data
             amaterno=usuarios_class.amaterno.data
             email=usuarios_class.email.data
@@ -151,48 +151,44 @@ def usuarios():
                                )
 
 
-@app.route("/cinepolis")
+@app.route("/cinepolis", methods=['GET', 'POST'])
 def cinepolis():
-    return render_template("cinepolis.html")
+    form = CinepolisForm()
+    total = None  
 
-@app.route('/calculoBoletos', methods=['POST'])
-def calculo_boletos():
-    # Recibimos los datos del formulario
-    nombre = request.form.get('nombre')
-    compradores = int(request.form.get('comprador'))
-    boletos = int(request.form.get('boletos'))
-    usa_tarjeta = request.form.get('tarjeta') # 'si' o 'no'
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            # 1. Recuperamos los datos si el formulario es válido (no está vacío)
+            compradores = form.compradores.data
+            boletos = form.boletos.data
+            tarjeta = form.tarjeta.data == 'si'
+            
+            # 2. Validación de lógica de negocio (Máximo 7 boletos por persona)
+            if boletos > (compradores * 7):
+                flash(f"Error: No se pueden comprar {boletos} boletos para {compradores} personas (Máximo 7 por persona).", "danger")
+            else:
+                # 3. Cálculo si todo es correcto
+                precio_boleto = 12.0
+                subtotal = boletos * precio_boleto
+                
+                # Descuentos por cantidad
+                if boletos > 5:
+                    subtotal *= 0.85  # 15% desc
+                elif 3 <= boletos <= 5:
+                    subtotal *= 0.90  # 10% desc
+                
+                # Descuento extra por tarjeta Cineco
+                if tarjeta:
+                    subtotal *= 0.90  # 10% desc adicional
+                
+                total = round(subtotal, 2)
+                flash(f"¡Venta procesada con éxito! Total: ${total}", "success")
+        else:
+            # 4. Si el formulario NO es válido (ej. campos vacíos que detecta la macro)
+            flash("Error en el formulario. Por favor, llena todos los campos correctamente.", "danger")
 
-    # REGLA: Máximo 7 boletos por persona
-    limite_boletos = compradores * 7
-    
-    if boletos > limite_boletos:
-        # Si excede el límite, podemos retornar un mensaje o limpiar el campo
-        mensaje_error = f"Error: {compradores} personas solo pueden comprar máximo {limite_boletos} boletos."
-        return render_template('cinepolis.html', total=mensaje_error)
-
-    # Cálculo base
-    precio_boleto = 12000
-    subtotal = boletos * precio_boleto
-
-    # DESCUENTO POR CANTIDAD DE BOLETOS
-    descuento_cantidad = 0
-    if boletos > 5:
-        descuento_cantidad = 0.15 # 15%
-    elif boletos >= 3: 
-        descuento_cantidad = 0.10 # 10%
-    
-    # Aplicamos el primer descuento
-    subtotal = subtotal - (subtotal * descuento_cantidad)
-
-    # DESCUENTO POR TARJETA CINECO (10% adicional)
-    if usa_tarjeta == "si":
-        subtotal = subtotal - (subtotal * 0.10)
-
-    # Resultado al formulario
-    return render_template('cinepolis.html', total=f"${subtotal:,.0f}")
+    return render_template("cinepolis.html", form=form, total=total)
 
 if __name__ == '__main__':
-    csrf.init_app(app)
     app.run(debug=True) #debug para modo programador, se actualiza cualquier dato sin necesidad de apagar y prender entorno
 

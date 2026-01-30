@@ -1,4 +1,4 @@
-{# Reutilizar elementos html #}
+{# Macro para campos genéricos #}
 {% macro datos(name, placeholder, type="text") %}
 <div class="mb-3">
     <label for="{{ name }}" class="form-label">{{ name }}:</label>
@@ -6,6 +6,7 @@
 </div>
 {% endmacro %}
 
+{# Macro para campos de Flask-WTF #}
 {% macro campoNuevo(field) %}
 <div class="mb-3">
     <td>{{ field.label }}</td>
