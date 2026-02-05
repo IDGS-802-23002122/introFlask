@@ -184,7 +184,6 @@ def cinepolis():
                 total = round(subtotal, 2)
                 flash(f"¡Venta procesada con éxito! Total: ${total}", "success")
         else:
-            # 4. Si el formulario NO es válido (ej. campos vacíos que detecta la macro)
             flash("Error en el formulario. Por favor, llena todos los campos correctamente.", "danger")
 
     return render_template("cinepolis.html", form=form, total=total)
